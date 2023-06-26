@@ -2,7 +2,7 @@
  * @Author: lvy lvy
  * @Date: 2023-06-15 18:26:09
  * @LastEditors: lvy lvy
- * @LastEditTime: 2023-06-19 01:09:41
+ * @LastEditTime: 2023-06-20 18:38:31
  * @FilePath: /my-t3-app/src/pages/canvas/scene.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -12,6 +12,7 @@ import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter'
 import useEditor from '~/store/actions'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as THREE from 'three'
+import OtherMesh from '~/pages/canvas/Mesh/index'
 extend({ OrbitControls })
 export default () => {
   const { pixelData } = useEditor() as any
@@ -62,6 +63,14 @@ export default () => {
     // Hold state for hovered and clicked events
     const [hovered, hover] = useState(false)
     const [clicked, click] = useState(false)
+    const { type } = props
+    function getGeometry() {
+      if (type == 'triangle') {
+        return <boxGeometry args={[0.1, 0.1, 0.05]} />
+      } else {
+        return <boxGeometry args={[0.1, 0.1, 0.05]} />
+      }
+    }
     // Subscribe this component to the render-loop, rotate the mesh every frame
     // useFrame((state, delta) => (ref.current.rotation.x += delta))
     // Return the view, these are regular Threejs elements expressed in JSX
@@ -70,12 +79,14 @@ export default () => {
         {...props}
         ref={ref}
         // scale={clicked ? 1.5 : 1}
-        onClick={(event) => click(!clicked)}
+        onClick={(event) => {
+          click(!clicked)
+        }}
         onPointerOver={(event) => hover(true)}
         onPointerOut={(event) => hover(false)}
       >
-        <boxGeometry args={[0.1, 0.1, 0.1]} />
-        <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
+        {getGeometry()}
+        <meshStandardMaterial color={props.color} />
       </mesh>
     )
   }
@@ -122,7 +133,13 @@ export default () => {
         {Object.values(pixelData).map((i: any) => {
           return (
             <>
-              <Box position={[i.x / 10, -i.y / 10, 0]} />
+              <OtherMesh
+                type="triangle"
+                position={[i.x / 10, -i.y / 10, 0]}
+                scale={[1, 1, i.scale]}
+                scaleDeth={i.scale}
+                color={i.color}
+              />
             </>
           )
         })}
